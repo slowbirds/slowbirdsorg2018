@@ -1,84 +1,100 @@
-import React from 'react'
-import { connect } from 'react-redux';
-import { load } from './user'
-
-import { withTheme, withStyles } from '@material-ui/core/styles'
-import { AppBar,Toolbar, Avatar, Card, CardContent, Button, Dialog, DialogTitle, DialogContent } from '@material-ui/core'
-import { Email } from '@material-ui/icons'
-import withWidth from '@material-ui/core/withWidth'
-import { orange } from '@material-ui/core/colors'
-
+import React  from 'react'
+import ReactDOM from 'react-dom'
 
 class App extends React.Component {
-
-  constructor (props) {
-    super(props)
-    this.state = {
-      open:false,
-      user:null,
+    constructor(props) {
+        super(props);
+        this.state = {
+            tasks:[]
+        };
     }
-  }
-
-  componentDidMount() {
-    // user取得APIコールのactionをキックする
-    this.props.load()
-  }
-
-  handleClickOpen (user) {
-    this.setState({
-      open: true,
-      user: user,
-    })
-  }
-
-  handleRequestClose () {
-    this.setState({ open: false })
-  }
-
-  render () {
-    const { users, theme, classes, width } = this.props
-    const { primary, secondary } = theme.palette
-
-    // 初回はnullが返ってくる（initialState）、処理完了後に再度結果が返ってくる
-    console.log(users)
-    return (
-      <div>
-        <AppBar position="static" color="primary">
-          <Toolbar classes={{root: classes.root}} >
-            タイトル({ width === 'xs' ? 'スマホ' : 'PC'})
-          </Toolbar>
-        </AppBar>
-        {/* 配列形式で返却されるためmapで展開する */}
-        {users && users.map((user) => {
-          return (
-              // ループで展開する要素には一意なkeyをつける（ReactJSの決まり事）
-              <Card key={user.email} style={{marginTop:'10px'}}>
-                <CardContent style={{color:'#408040'}}>
-                  <Avatar src={user.picture.thumbnail} />
-                  <p style={{margin:10, color:primary[500]}}>{'名前:' + user.name.first + ' ' + user.name.last} </p>
-                  <p style={{margin:10, color:secondary[500]}}>{'性別:' + (user.gender == 'male' ? '男性' : '女性')}</p>
-                  <div style={{textAlign: 'right'}} >
-                    <Button variant="raised" color='secondary' onClick={() => this.handleClickOpen(user)}><Email style={{marginRight: 5, color: orange[200]}}/>Email</Button>
-                  </div>
-                </CardContent>
-              </Card>
-          )
-        })}
-        {
-          this.state.open &&
-          <Dialog open={this.state.open} onClose={() => this.handleRequestClose()}>
-            <DialogTitle>メールアドレス</DialogTitle>
-            <DialogContent>{this.state.user.email}</DialogContent>
-          </Dialog>
+    updateTable(e) {
+        e.preventDefault();
+        let tasks         = this.state.tasks;
+        let taskId        = this.state.tasks.length;
+        let taskTitle     = ReactDOM.findDOMNode(this.refs.title).value.trim();
+        let taskSchedule  = ReactDOM.findDOMNode(this.refs.schedule).value.trim();
+        let taskDone      = false;
+        tasks.push({id: taskId, title: taskTitle, schedule: taskSchedule, done: taskDone});
+        this.setState({tasks:tasks});
+    }
+    componentDidMount() {
+        
+    }
+    componentDidUpdate() {
+        
+    }
+    changeSelection(id,e) {
+        let tasks_copy = this.state.tasks.slice();
+        tasks_copy[id].done = true;
+        this.setState({tasks: tasks_copy});
+    }
+    noItems(tasks) {
+        if(tasks.filter(task => task.done === false).length === 0) {
+            return (<div>no items</div>)
         }
-      </div>
-    )
-  }
+    }
+    makeList(tasks) {
+        return (tasks.filter(task => task.done === false).map((task, index) =>
+            <tr key={index} id={"task_"+task.id}>
+                <th>
+                    <input type="checkbox" checked={task.done} onChange={this.changeSelection.bind(this, task.id)} />
+                </th>
+                <td>{task.title}</td>
+                <td>{task.schedule}</td>
+            </tr>
+        ));
+    }
+    closedList(tasks) {
+        return (tasks.filter(task => task.done === true).map((task, index) =>
+            <tr key={index} id={"task_"+task.id}>
+                <td>{task.title}</td>
+                <td>{task.schedule}</td>
+            </tr>
+        ));
+    }
+    render() {
+        let taskList = this.makeList(this.state.tasks);
+        return (
+            <div>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Done</th>
+                        <th>Task</th>
+                        <th>When</th>
+                    </tr>
+                    </thead>
+                    <tbody id="taskListBody">
+                    {taskList}
+                    </tbody>
+                </table>
+                {this.noItems(this.state.tasks)}
+                <hr />
+                <form onSubmit={(e)=>this.updateTable(e)}>
+                <dl>
+                    <dt>Task:</dt>
+                    <dd><input type="text" ref="title" /></dd>
+                    <dt>When:</dt>
+                    <dd><input type="text" ref="schedule" /></dd>
+                </dl>
+                <button>add task</button>
+                </form>
+                <h2>Closed Tasks</h2>
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Task</th>
+                        <th>When</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {this.closedList(this.state.tasks)}
+                    </tbody>
+                </table>
+            </div>
+        )
+    }
 }
 
-export default connect(
-  state => ({
-    users: state.user.users
-  }),
-  { load }
-)(App)
+export default App

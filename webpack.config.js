@@ -12,10 +12,7 @@ module.exports = {
         use: {
             loader: 'babel-loader', // babel-loaderを使って変換する
             options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
-            plugins: [
-                ['@babel/plugin-proposal-class-properties', { loose: true }], // 追加
-            ],
+                presets: ['@babel/preset-env', '@babel/preset-react']
             }        
         }
         }]
