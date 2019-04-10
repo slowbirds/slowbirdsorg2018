@@ -38,6 +38,9 @@ h1 a {
   text-decoration: none;
 }
 
+#items ul {
+  margin: 0 0 1rem;
+}
 #items ul, #items li {
   list-style: none;
   padding: 0;
