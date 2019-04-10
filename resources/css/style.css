@@ -31,12 +31,10 @@ h1 a {
   display: block;
   position: absolute;
   top: 3%;
-  right: 3%;
-  font-size: 2rem;
-  font-weight: bold;
-  color: rgba(255,255,255,0.7);
+  left: 3%;
+  font-size: 3rem;
+  color: rgba(255,255,255,0.8);
   text-align: right;
-  vertical-align: bottom;
   text-decoration: none;
 }
 
