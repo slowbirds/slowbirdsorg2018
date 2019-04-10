@@ -24,7 +24,7 @@ h1 {
   margin: 0;
   background: url(../images/main.jpg) 0 0 no-repeat;
   background-size: contain;
-
+  font-family: 'Poiret One', cursive;
   position: relative;
 }
 h1 a {
